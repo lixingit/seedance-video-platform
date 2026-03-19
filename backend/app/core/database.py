@@ -32,3 +32,33 @@ def get_db():
 def init_db():
     """初始化数据库表"""
     Base.metadata.create_all(bind=engine)
+    _run_migrations()
+
+
+def _run_migrations():
+    """运行数据库迁移（为已存在的表添加新列）"""
+    import sqlite3
+    from .config import settings
+
+    db_path = settings.DATABASE_URL.replace("sqlite:///", "")
+    if not db_path or not __import__("os").path.exists(db_path):
+        return
+
+    conn = sqlite3.connect(db_path)
+    cursor = conn.cursor()
+
+    # 获取 video_tasks 表的现有列
+    cursor.execute("PRAGMA table_info(video_tasks)")
+    existing_columns = {row[1] for row in cursor.fetchall()}
+
+    migrations = [
+        ("last_frame_image_url", "ALTER TABLE video_tasks ADD COLUMN last_frame_image_url VARCHAR(500)"),
+        ("last_frame_image_path", "ALTER TABLE video_tasks ADD COLUMN last_frame_image_path VARCHAR(500)"),
+    ]
+
+    for col_name, sql in migrations:
+        if col_name not in existing_columns:
+            cursor.execute(sql)
+
+    conn.commit()
+    conn.close()

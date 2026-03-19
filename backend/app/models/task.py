@@ -42,6 +42,10 @@ class VideoTask(Base):
     first_frame_image_path = Column(String(500), nullable=True)
     first_frame_image_url = Column(String(500), nullable=True)
 
+    # 尾帧图片
+    last_frame_image_url = Column(String(500), nullable=True)
+    last_frame_image_path = Column(String(500), nullable=True)
+
     # 生成结果
     video_url = Column(String(500), nullable=True)
     video_path = Column(String(500), nullable=True)
