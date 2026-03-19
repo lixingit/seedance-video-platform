@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     ARK_API_KEY: str = os.getenv("ARK_API_KEY", "")
     ARK_BASE_URL: str = os.getenv("ARK_BASE_URL", "https://ark.cn-beijing.volces.com/api/v3")
     ARK_MODEL: str = os.getenv("ARK_MODEL", "doubao-seedance-1-5-pro-251215")
+    ARK_IMAGE_MODEL: str = os.getenv("ARK_IMAGE_MODEL", "doubao-seedream-4-0-250828")
 
     # 服务器配置
     HOST: str = os.getenv("HOST", "0.0.0.0")
