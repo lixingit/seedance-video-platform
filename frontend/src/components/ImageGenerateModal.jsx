@@ -124,7 +124,7 @@ const ImageGenerateModal = ({ open, onCancel, onSelect, initialPrompt }) => {
           ))}
         </Row>
       ) : (
-        !loading && <Empty description="点击"生成图片"开始" />
+        !loading && <Empty description={'点击"生成图片"开始'} />
       )}
 
       {errors.length > 0 && (

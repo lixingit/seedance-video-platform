@@ -22,6 +22,9 @@ import {
 } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { createVideoTask, getUsername } from '../services/api';
+import FrameUpload from '../components/FrameUpload';
+import ImageGenerateModal from '../components/ImageGenerateModal';
+import AssetPickerModal from '../components/AssetPickerModal';
 
 const { Content, Header } = Layout;
 const { Title, Text } = Typography;
@@ -55,14 +58,42 @@ const Generate = () => {
   const navigate = useNavigate();
   const username = getUsername();
 
+  const [firstFrameUrl, setFirstFrameUrl] = useState(null);
+  const [lastFrameUrl, setLastFrameUrl] = useState(null);
+  const [imageGenModalVisible, setImageGenModalVisible] = useState(false);
+  const [assetPickerVisible, setAssetPickerVisible] = useState(false);
+  const [activeFrameTarget, setActiveFrameTarget] = useState(null); // 'first' or 'last'
+
   const handleTemplateSelect = (template) => {
     form.setFieldsValue({ prompt: template });
+  };
+
+  const openAIGenerate = (target) => {
+    setActiveFrameTarget(target);
+    setImageGenModalVisible(true);
+  };
+
+  const openAssetPicker = (target) => {
+    setActiveFrameTarget(target);
+    setAssetPickerVisible(true);
+  };
+
+  const handleImageSelected = (url) => {
+    if (activeFrameTarget === 'first') {
+      setFirstFrameUrl(url);
+    } else {
+      setLastFrameUrl(url);
+    }
   };
 
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      const task = await createVideoTask(values);
+      const task = await createVideoTask({
+        ...values,
+        first_frame_image_url: firstFrameUrl,
+        last_frame_image_url: lastFrameUrl,
+      });
       message.success('视频任务创建成功！');
       navigate('/history');
     } catch (error) {
@@ -130,6 +161,29 @@ const Generate = () => {
                     maxLength={500}
                   />
                 </Form.Item>
+
+                {/* 首帧/尾帧图片 */}
+                <Divider style={{ margin: '16px 0' }}>帧图片（可选）</Divider>
+                <Row gutter={16}>
+                  <Col span={12}>
+                    <FrameUpload
+                      label="首帧图片（可选）"
+                      value={firstFrameUrl}
+                      onChange={setFirstFrameUrl}
+                      onPickFromLibrary={() => openAssetPicker('first')}
+                      onAIGenerate={() => openAIGenerate('first')}
+                    />
+                  </Col>
+                  <Col span={12}>
+                    <FrameUpload
+                      label="尾帧图片（可选）"
+                      value={lastFrameUrl}
+                      onChange={setLastFrameUrl}
+                      onPickFromLibrary={() => openAssetPicker('last')}
+                      onAIGenerate={() => openAIGenerate('last')}
+                    />
+                  </Col>
+                </Row>
 
                 {/* 高级选项 */}
                 <Collapse ghost>
@@ -205,6 +259,21 @@ const Generate = () => {
           </Col>
         </Row>
       </Content>
+
+      {/* AI 图片生成弹窗 */}
+      <ImageGenerateModal
+        open={imageGenModalVisible}
+        onCancel={() => setImageGenModalVisible(false)}
+        onSelect={handleImageSelected}
+        initialPrompt={form.getFieldValue('prompt') || ''}
+      />
+
+      {/* 素材库选图弹窗 */}
+      <AssetPickerModal
+        open={assetPickerVisible}
+        onCancel={() => setAssetPickerVisible(false)}
+        onSelect={handleImageSelected}
+      />
     </Layout>
   );
 };
