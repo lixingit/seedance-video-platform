@@ -10,7 +10,7 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
-from app.models import VideoTask, TaskStatus
+from app.models import VideoTask, TaskStatus, Asset
 from app.services.seedance import get_seedance_service
 
 logger = logging.getLogger(__name__)
@@ -114,6 +114,28 @@ class TaskPoller:
             task.completed_at = datetime.utcnow()
             self.remove_task(task_id)
             logger.info(f"Task {task_id} completed successfully")
+
+            # 自动创建视频 Asset 记录
+            if task.video_url:
+                try:
+                    asset = Asset(
+                        user_id=task.user_id,
+                        type="video",
+                        source="video_generated",
+                        name=f"视频-{task.prompt[:20]}",
+                        file_url=task.video_url,
+                        related_task_id=task.id,
+                    )
+                    asset.set_metadata({
+                        "duration": task.duration,
+                        "resolution": task.resolution,
+                        "prompt": task.prompt,
+                    })
+                    db.add(asset)
+                    db.commit()
+                    logger.info(f"Auto-created video asset for task {task_id}")
+                except Exception as e:
+                    logger.error(f"Failed to auto-create video asset: {e}")
 
         elif new_status == "failed":
             task.status = TaskStatus.FAILED
