@@ -5,7 +5,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ConfigProvider } from 'antd';
 import zhCN from 'antd/locale/zh_CN';
-import { Login, Generate, History } from './pages';
+import { Login, Generate, History, Assets } from './pages';
 import { getUsername } from './services/api';
 
 // 路由保护
@@ -36,6 +36,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <History />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/assets"
+            element={
+              <ProtectedRoute>
+                <Assets />
               </ProtectedRoute>
             }
           />
