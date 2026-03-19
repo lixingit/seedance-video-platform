@@ -39,6 +39,7 @@ class VideoTaskCreate(BaseModel):
     motion_intensity: Optional[str] = Field("standard", description="运动强度: gentle/standard/intense")
     first_frame_image: Optional[str] = Field(None, description="首帧图片（base64或URL）")
     first_frame_image_url: Optional[str] = Field(None, description="首帧图片URL")
+    last_frame_image_url: Optional[str] = Field(None, description="尾帧图片URL")
 
 
 class VideoTaskResponse(BaseModel):
@@ -54,6 +55,8 @@ class VideoTaskResponse(BaseModel):
     motion_intensity: Optional[str]
     first_frame_image_path: Optional[str]
     first_frame_image_url: Optional[str]
+    last_frame_image_url: Optional[str] = None
+    last_frame_image_path: Optional[str] = None
     video_url: Optional[str]
     video_path: Optional[str]
     status: str
@@ -124,3 +127,80 @@ class ErrorResponse(BaseModel):
 
     error: str
     detail: Optional[str] = None
+
+
+# ========== 素材相关 ==========
+
+
+class AssetResponse(BaseModel):
+    """素材响应"""
+
+    id: int
+    user_id: int
+    username: str = ""
+    type: str
+    source: str
+    name: Optional[str] = None
+    description: Optional[str] = None
+    file_url: Optional[str] = None
+    file_path: Optional[str] = None
+    content: Optional[str] = None
+    tags_list: Optional[List[str]] = None
+    is_shared: bool = False
+    related_task_id: Optional[int] = None
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {
+        "from_attributes": True,
+    }
+
+
+class AssetListResponse(BaseModel):
+    """素材列表响应（分页）"""
+
+    items: List[AssetResponse]
+    total: int
+    page: int
+    page_size: int
+    total_pages: int
+
+
+class AssetUpdate(BaseModel):
+    """更新素材请求"""
+
+    name: Optional[str] = None
+    description: Optional[str] = None
+    tags: Optional[List[str]] = None
+    is_shared: Optional[bool] = None
+
+
+class PromptTemplateCreate(BaseModel):
+    """创建提示词模板请求"""
+
+    name: str = Field(..., min_length=1)
+    content: str = Field(..., min_length=1)
+    tags: Optional[List[str]] = None
+
+
+class ImageGenerateRequest(BaseModel):
+    """图片生成请求"""
+
+    prompt: str = Field(..., min_length=1)
+    n: int = Field(4, ge=1, le=8)
+    size: str = Field("1024x1024")
+
+
+class ImageGenerateResponse(BaseModel):
+    """图片生成响应"""
+
+    images: List[AssetResponse]
+    errors: List[dict] = []
+
+
+class ImageUploadResponse(BaseModel):
+    """图片上传响应"""
+
+    asset_id: int
+    file_url: str
+    file_path: str
