@@ -47,6 +47,7 @@ class SeedanceService:
         camera_fixed: bool = False,
         watermark: bool = True,
         first_frame_url: Optional[str] = None,
+        last_frame_url: Optional[str] = None,
         negative_prompt: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
@@ -91,6 +92,19 @@ class SeedanceService:
                     "type": "image_url",
                     "image_url": {
                         "url": first_frame_url,
+                        "position": "first_frame",
+                    },
+                }
+            )
+
+        # 添加尾帧图片
+        if last_frame_url:
+            content.append(
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": last_frame_url,
+                        "position": "last_frame",
                     },
                 }
             )
