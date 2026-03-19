@@ -49,6 +49,7 @@ async def create_video_task(
         duration=request.duration,
         motion_intensity=request.motion_intensity,
         first_frame_image_url=request.first_frame_image_url,
+        last_frame_image_url=request.last_frame_image_url,
         status=TaskStatus.PENDING,
     )
     db.add(task)
@@ -67,6 +68,7 @@ async def create_video_task(
             camera_fixed=False,
             watermark=True,
             first_frame_url=request.first_frame_image_url,
+            last_frame_url=request.last_frame_image_url,
             negative_prompt=request.negative_prompt,
         )
 
