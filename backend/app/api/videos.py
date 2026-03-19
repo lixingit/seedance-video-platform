@@ -20,21 +20,11 @@ from app.api.schemas import (
     MessageResponse,
 )
 from app.services import get_seedance_service, get_task_poller
+from app.api.utils import get_or_create_user
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/videos", tags=["videos"])
-
-
-def get_or_create_user(db: Session, username: str) -> User:
-    """获取或创建用户"""
-    user = db.query(User).filter(User.username == username).first()
-    if not user:
-        user = User(username=username)
-        db.add(user)
-        db.commit()
-        db.refresh(user)
-    return user
 
 
 @router.post("", response_model=VideoTaskResponse)
