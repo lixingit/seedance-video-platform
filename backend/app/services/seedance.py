@@ -3,6 +3,8 @@ Seedance SDK 封装服务
 """
 import os
 import time
+import base64
+import mimetypes
 import logging
 from typing import Optional, Dict, Any, List
 from pathlib import Path
@@ -91,9 +93,9 @@ class SeedanceService:
                 {
                     "type": "image_url",
                     "image_url": {
-                        "url": first_frame_url,
-                        "position": "first_frame",
+                        "url": self._resolve_image_url(first_frame_url),
                     },
+                    "role": "first_frame",
                 }
             )
 
@@ -103,9 +105,9 @@ class SeedanceService:
                 {
                     "type": "image_url",
                     "image_url": {
-                        "url": last_frame_url,
-                        "position": "last_frame",
+                        "url": self._resolve_image_url(last_frame_url),
                     },
+                    "role": "last_frame",
                 }
             )
 
@@ -148,6 +150,36 @@ class SeedanceService:
             "error": error,
             "raw_result": result,
         }
+
+    def _resolve_image_url(self, url: str) -> str:
+        """将本地路径的图片转为 base64 data URL，远程 URL 直接返回"""
+        if url.startswith(("http://", "https://")):
+            return url
+
+        # 本地路径：/storage/images/xxx.png -> 读取文件转 base64
+        if url.startswith("/storage/"):
+            local_path = settings.STORAGE_PATH / url.lstrip("/storage/")
+            if not local_path.exists():
+                # 尝试用 STORAGE_PATH 的父目录拼接
+                local_path = Path(settings.STORAGE_PATH).parent / url.lstrip("/")
+            if not local_path.exists():
+                logger.warning(f"Image file not found: {url}, trying absolute path")
+                # 直接用 IMAGES_PATH 拼文件名
+                filename = os.path.basename(url)
+                local_path = settings.IMAGES_PATH / filename
+        else:
+            local_path = Path(url)
+
+        if local_path.exists():
+            mime_type = mimetypes.guess_type(str(local_path))[0] or "image/png"
+            with open(local_path, "rb") as f:
+                b64 = base64.b64encode(f.read()).decode("utf-8")
+            data_url = f"data:{mime_type};base64,{b64}"
+            logger.info(f"Converted local image to base64 data URL ({len(b64)} chars)")
+            return data_url
+
+        logger.warning(f"Cannot resolve image URL: {url}")
+        return url
 
     def _extract_video_url(self, result) -> Optional[str]:
         """从结果中提取视频 URL"""
