@@ -20,7 +20,7 @@ import {
   VideoCameraOutlined,
   ThunderboltOutlined,
 } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { createVideoTask, getUsername } from '../services/api';
 import FrameUpload from '../components/FrameUpload';
 import ImageGenerateModal from '../components/ImageGenerateModal';
@@ -57,6 +57,18 @@ const Generate = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const username = getUsername();
+
+  const location = useLocation();
+
+  // 从素材库跳转过来时，填入帧图片
+  React.useEffect(() => {
+    if (location.state?.firstFrameUrl) {
+      setFirstFrameUrl(location.state.firstFrameUrl);
+    }
+    if (location.state?.lastFrameUrl) {
+      setLastFrameUrl(location.state.lastFrameUrl);
+    }
+  }, [location.state]);
 
   const [firstFrameUrl, setFirstFrameUrl] = useState(null);
   const [lastFrameUrl, setLastFrameUrl] = useState(null);
@@ -241,6 +253,13 @@ const Generate = () => {
                     onClick={() => navigate('/history')}
                   >
                     查看历史
+                  </Button>
+                  <Button
+                    style={{ marginLeft: 12 }}
+                    size="large"
+                    onClick={() => navigate('/assets')}
+                  >
+                    素材库
                   </Button>
                 </Form.Item>
               </Form>
