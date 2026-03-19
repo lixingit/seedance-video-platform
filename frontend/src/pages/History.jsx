@@ -20,6 +20,7 @@ import {
   Tooltip,
   Popconfirm,
   Empty,
+  Image,
 } from 'antd';
 import {
   VideoCameraOutlined,
@@ -311,7 +312,15 @@ const History = () => {
           <VideoCameraOutlined style={{ fontSize: 24, color: '#1890ff', margin: '0 12px' }} />
           <Title level={4} style={{ margin: 0 }}>历史记录</Title>
         </div>
-        <Text>当前用户：{username}</Text>
+        <div>
+          <Button
+            style={{ marginLeft: 8 }}
+            onClick={() => navigate('/assets')}
+          >
+            素材库
+          </Button>
+          <Text style={{ marginLeft: 16 }}>当前用户：{username}</Text>
+        </div>
       </Header>
 
       <Content style={{ padding: '24px', background: '#f5f5f5' }}>
@@ -364,6 +373,28 @@ const History = () => {
                 style={{ width: '100%', marginBottom: 16 }}
                 controls
               />
+            )}
+            {selectedTask.first_frame_image_url && (
+              <div style={{ marginBottom: 16 }}>
+                <Text strong>首帧图片：</Text>
+                <br />
+                <Image
+                  src={selectedTask.first_frame_image_url}
+                  width={200}
+                  style={{ marginTop: 8, borderRadius: 4 }}
+                />
+              </div>
+            )}
+            {selectedTask.last_frame_image_url && (
+              <div style={{ marginBottom: 16 }}>
+                <Text strong>尾帧图片：</Text>
+                <br />
+                <Image
+                  src={selectedTask.last_frame_image_url}
+                  width={200}
+                  style={{ marginTop: 8, borderRadius: 4 }}
+                />
+              </div>
             )}
             <Paragraph>
               <Text strong>提示词：</Text>
