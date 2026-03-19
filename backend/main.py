@@ -12,7 +12,7 @@ from pathlib import Path
 from app.core.config import settings
 from app.core.database import init_db
 from app.services import start_task_poller, stop_task_poller
-from app.api import videos_router, users_router, images_router
+from app.api import videos_router, users_router, images_router, assets_router
 
 # 配置日志
 logging.basicConfig(
@@ -64,6 +64,7 @@ app.add_middleware(
 app.include_router(videos_router)
 app.include_router(users_router)
 app.include_router(images_router)
+app.include_router(assets_router)
 
 # 静态文件服务
 storage_path = Path(settings.STORAGE_PATH)
