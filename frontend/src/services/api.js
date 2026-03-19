@@ -84,4 +84,64 @@ export const deleteTask = async (taskId) => {
   return response.data;
 };
 
+
+// ========== 图片 API ==========
+
+export const uploadImage = async (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  const response = await api.post('/images/upload', formData, {
+    params: withUsername(),
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 60000,
+  });
+  return response.data;
+};
+
+export const generateImages = async (data) => {
+  const response = await api.post('/images/generate', data, {
+    params: withUsername(),
+    timeout: 120000,
+  });
+  return response.data;
+};
+
+// ========== 素材 API ==========
+
+export const listAssets = async (params = {}) => {
+  const response = await api.get('/assets', {
+    params: withUsername(params),
+  });
+  return response.data;
+};
+
+export const getAsset = async (assetId) => {
+  const response = await api.get(`/assets/${assetId}`, {
+    params: withUsername(),
+  });
+  return response.data;
+};
+
+export const updateAsset = async (assetId, data) => {
+  const response = await api.put(`/assets/${assetId}`, data, {
+    params: withUsername(),
+  });
+  return response.data;
+};
+
+export const deleteAsset = async (assetId) => {
+  const response = await api.delete(`/assets/${assetId}`, {
+    params: withUsername(),
+  });
+  return response.data;
+};
+
+export const createPromptTemplate = async (data) => {
+  const response = await api.post('/assets/prompt-template', data, {
+    params: withUsername(),
+  });
+  return response.data;
+};
+
 export default api;
+
